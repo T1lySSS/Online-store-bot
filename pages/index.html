@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vergil's Motivation Shop</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            text-align: center;
+            padding: 20px;
+        }
+        .btn {
+            background-color: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Вітаємо у Mini App магазині!</h1>
+    <p>Тут буде вибір цифрових товарів.</p>
+    <button class="btn" onclick="showAlert()">Тест кнопки</button>
+
+    <script>
+        // Инициализируем WebApp
+        const tg = window.Telegram.WebApp;
+        tg.ready(); // Сообщаем Telegram, что приложение загрузилось
+
+        function showAlert() {
+            tg.showAlert("Мотивація активована!");
+        }
+    </script>
+</body>
+</html>
