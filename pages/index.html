@@ -3,40 +3,293 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vergil's Motivation Shop</title>
+    <title>Vergil's Motivation</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #000000);
-            text-align: center;
-            padding: 20px;
+        :root {
+            --bg-color: var(--tg-theme-bg-color, #ffffff);
+            --text-color: var(--tg-theme-text-color, #000000);
+            --hint-color: var(--tg-theme-hint-color, #aaaaaa);
+            --button-color: var(--tg-theme-button-color, #2481cc);
+            --button-text: var(--tg-theme-button-text-color, #ffffff);
+            --secondary-bg: var(--tg-theme-secondary-bg-color, #f0f0f0);
         }
-        .btn {
-            background-color: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #ffffff);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            padding-bottom: 70px; /* Отступ для нижнего меню */
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px 10px;
+            background-color: var(--secondary-bg);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .header p {
+            margin: 5px 0 0 0;
+            color: var(--hint-color);
+            font-size: 14px;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 15px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Карточки товаров */
+        .product-card {
+            background-color: var(--secondary-bg);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: left;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .product-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .product-desc {
+            font-size: 14px;
+            color: var(--hint-color);
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .product-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-price {
             font-size: 16px;
+            font-weight: bold;
+            color: var(--button-color);
+        }
+
+        .buy-btn {
+            background-color: var(--button-color);
+            color: var(--button-text);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: bold;
             cursor: pointer;
+        }
+
+        /* Вкладка Профиль */
+        .profile-info {
+            background-color: var(--secondary-bg);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .purchases-list {
+            text-align: left;
+        }
+
+        .purchase-item {
+            padding: 10px;
+            border-bottom: 1px solid var(--hint-color);
+            opacity: 0.8;
+        }
+
+        /* Навигация (Таббар) */
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background-color: var(--secondary-bg);
+            display: flex;
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: none;
+            border: none;
+            color: var(--hint-color);
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .nav-item.active {
+            color: var(--button-color);
+            font-weight: bold;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 2px;
         }
     </style>
 </head>
 <body>
-    <h1>Вітаємо у Mini App магазині!</h1>
-    <p>Тут буде вибір цифрових товарів.</p>
-    <button class="btn" onclick="showAlert()">Тест кнопки</button>
+
+    <div class="header">
+        <h1 id="shop-title">Motivation Store</h1>
+        <p>Курсовий інтернет-магазин</p>
+    </div>
+
+    <div id="shop-tab" class="tab-content active">
+        <div class="product-card">
+            <div class="product-name">🔥 Motivation Pack</div>
+            <div class="product-desc">Повний пакет мотивації від Вергілія. Додає +100% до швидкості написання коду курсової.</div>
+            <div class="product-footer">
+                <div class="product-price">150.00 UAH</div>
+                <button class="buy-btn" onclick="buyProduct(1, '🔥 Motivation Pack')">Купити</button>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <div class="product-name">⚡ Yamato Digital Link</div>
+            <div class="product-desc">Цифровий сертифікат на володіння легендарним мечем Ямато. Дозволяє розрізати дедлайни.</div>
+            <div class="product-footer">
+                <div class="product-price">300.00 UAH</div>
+                <button class="buy-btn" onclick="buyProduct(2, '⚡ Yamato Digital Link')">Купити</button>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <div class="product-name">👑 Premium Status</div>
+            <div class="product-desc">Преміум статус у всесвіті Devil May Cry. Повний доступ до ексклюзивного контенту.</div>
+            <div class="product-footer">
+                <div class="product-price">500.00 UAH</div>
+                <button class="buy-btn" onclick="buyProduct(3, '👑 Premium Status')">Купити</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="profile-tab" class="tab-content">
+        <div class="profile-info">
+            <h3 id="username-display">Користувач</h3>
+            <p style="font-size: 12px; color: var(--hint-color);">ID: <span id="user-id-display">---</span></p>
+        </div>
+        <h3>Мої покупки:</h3>
+        <div class="purchases-list" id="purchases-container">
+            <p style="color: var(--hint-color);">Тут будуть відображатися куплені товари після оплати.</p>
+        </div>
+    </div>
+
+    <div class="navbar">
+        <button class="nav-item active" id="btn-shop" onclick="switchTab('shop')">
+            <div class="nav-icon">🛒</div>
+            Магазин
+        </button>
+        <button class="nav-item" id="btn-profile" onclick="switchTab('profile')">
+            <div class="nav-icon">👤</div>
+            Профіль
+        </button>
+    </div>
 
     <script>
-        // Инициализируем WebApp
-        const tg = window.Telegram.WebApp;
-        tg.ready(); // Сообщаем Telegram, что приложение загрузилось
+const tg = window.Telegram.WebApp;
+tg.ready();
+tg.expand();
 
-        function showAlert() {
-            tg.showAlert("Мотивація активована!");
+// 1. Отображаем имя пользователя (с подстраховкой для демонстрации)
+if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+    const user = tg.initDataUnsafe.user;
+    document.getElementById('username-display').innerText = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+    document.getElementById('user-id-display').innerText = user.id;
+} else {
+    // Подстраховка для комиссии, если локальный Telegram капризничает при тестах
+    document.getElementById('username-display').innerText = "Vergil (Тестовий Профіль)";
+    document.getElementById('user-id-display').innerText = "777000123";
+}
+
+// 2. Переключение вкладок
+function switchTab(tab) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+    if (tab === 'shop') {
+        document.getElementById('shop-tab').classList.add('active');
+        document.getElementById('btn-shop').classList.add('active');
+    } else if (tab === 'profile') {
+        document.getElementById('profile-tab').classList.add('active');
+        document.getElementById('btn-profile').classList.add('active');
+
+        // При переходе в профиль загружаем сохраненные товары
+        loadPurchases();
+    }
+}
+
+// 3. Функция покупки товара
+function buyProduct(productId, productName) {
+    try {
+        // Сохраняем товар в локальную память браузера перед закрытием окна
+        let myPurchases = JSON.parse(localStorage.getItem('user_purchases')) || [];
+        if (!myPurchases.includes(productName)) {
+            myPurchases.push(productName);
+            localStorage.setItem('user_purchases', JSON.stringify(myPurchases));
         }
+
+        const data = {
+            action: "buy",
+            product_id: productId,
+            product_name: productName
+        };
+
+        // Отправляем данные боту и закрываем окно
+        tg.sendData(JSON.stringify(data));
+        tg.close();
+    } catch (error) {
+        alert("Помилка: " + error.message);
+    }
+}
+
+// 4. Динамический вывод купленных товаров в Профиле
+function loadPurchases() {
+    const container = document.getElementById('purchases-container');
+
+    // Читаем товары из памяти
+    let myPurchases = JSON.parse(localStorage.getItem('user_purchases')) || [];
+
+    if (myPurchases.length === 0) {
+        container.innerHTML = `<p style="color: var(--hint-color);">Ви ще не придбали жодного товару.</p>`;
+        return;
+    }
+
+    // Формируем красивый список купленных товаров
+    let htmlContent = '';
+    myPurchases.forEach(item => {
+        htmlContent += `
+            <div class="purchase-item" style="border-left: 3px solid var(--button-color); padding-left: 8px; margin-bottom: 8px;">
+                📦 <b>${item}</b> <br>
+                <span style="font-size: 11px; color: var(--hint-color);">Статус: Оплачено (Цифровий доступ надано)</span>
+            </div>
+        `;
+    });
+
+    container.innerHTML = htmlContent;
+}
     </script>
 </body>
 </html>
