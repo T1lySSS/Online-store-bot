@@ -8,13 +8,12 @@ WEB_APP_URL = "https://unfixable-employer-regally.ngrok-free.dev"
 
 @router.message(CommandStart())
 async def start_command(message: types.Message):
-    # Регистрируем пользователя в базе данных
     register_user(
         telegram_id=message.from_user.id,
         username=message.from_user.username
     )
 
-    # Создаем Reply-клавиатуру (она появится вместо стандартных кнопок букв)
+
     markup = ReplyKeyboardMarkup(
         keyboard=[
             [
@@ -24,7 +23,7 @@ async def start_command(message: types.Message):
                 )
             ]
         ],
-        resize_keyboard=True # Делаем кнопку аккуратной и маленькой
+        resize_keyboard=True
     )
 
     await message.answer(

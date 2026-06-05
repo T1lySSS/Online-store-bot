@@ -1,6 +1,6 @@
 from db import Sessionlocal
 from db.models import User, Purchase, Product
-
+from db.models import Seller
 
 def register_user(telegram_id: int, username:str = None):
     with Sessionlocal() as session:
@@ -39,3 +39,18 @@ def seed_products():
             session.add_all(products)
             session.commit()
             print("База даних успішно заповнена тестовими товарами!")
+
+def register_seller(telegram_id: int, shop_name: str):
+    with Sessionlocal() as session:
+        seller = session.query(Seller).filter(Seller.user_id == telegram_id).first()
+        if not seller:
+            new_seller = Seller(user_id=telegram_id, shop_name=shop_name)
+            session.add(new_seller)
+            session.commit()
+            return True
+        return False
+
+def is_user_seller(telegram_id: int) -> bool:
+    with Sessionlocal() as session:
+        seller = session.query(Seller).filter(Seller.user_id == telegram_id).first()
+        return seller is not None

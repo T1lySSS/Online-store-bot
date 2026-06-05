@@ -1,6 +1,8 @@
 import json
+import os
 from aiogram import Router, F, types
-from db.requests import save_purchase
+from aiogram.types import LabeledPrice
+from handlers.payments import PROVIDER_TOKEN
 
 router = Router()
 
@@ -15,14 +17,25 @@ async def handle_webapp_data(message: types.Message):
         if data.get("action") == "buy":
             product_id = int(data.get("product_id"))
             product_name = data.get("product_name")
-            user_id = message.from_user.id
-            save_purchase(telegram_id=user_id, product_id=product_id)
-            await message.answer(
-                f"🎉 **Успішна покупка!**\n\n"
-                f"Ви придбали товар: **{product_name}**\n"
-                f"Дякуємо за замовлення! Товар додано у ваш профіль в Mini App."
+
+
+            price_map = {1: 15000, 2: 30000, 3: 50000}
+            product_price = price_map.get(product_id, 10000)
+
+
+            await message.bot.send_invoice(
+                chat_id=message.chat.id,
+                title=f"Купівля: {product_name}",
+                description=f"Оплата цифрового доступу до продукту {product_name} для курсового проекту.",
+                payload=f"product_id_{product_id}",
+                provider_token=PROVIDER_TOKEN,
+                currency="UAH",
+                prices=[
+                    LabeledPrice(label=product_name, amount=product_price)
+                ],
+                start_parameter="motivation-store-payment"
             )
 
     except Exception as e:
-        await message.answer("Виникла помилка при обробці замовлення.")
+        await message.answer("Виникла помилка при генерації рахунку.")
         print(f"Ошибка в webapp handler: {e}")

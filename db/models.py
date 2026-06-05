@@ -25,3 +25,12 @@ class Purchase(Base):
     user_id = Column(Integer, ForeignKey("users.telegram_id", ondelete="CASCADE"), nullable=False)
     product_id = Column(Integer, ForeignKey("products.id", ondelete="CASCADE"), nullable=False)
     purchased_at = Column(DateTime, default=datetime.utcnow)
+
+
+class Seller(Base):
+    __tablename__ = "sellers"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.telegram_id", ondelete="CASCADE"), unique=True, nullable=False)
+    shop_name = Column(String, nullable=False)
+    registered_at = Column(DateTime, default=datetime.utcnow)
