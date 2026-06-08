@@ -2,47 +2,44 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vergil's Motivation Store</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Motivation Store</title>
+
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="/pages/styles.css?v=3">
+
+    <link rel="stylesheet" href="/pages/styles.css">
 </head>
 <body>
 
-    <div class="header">
-        <h1 id="shop-title">Motivation Store</h1>
-        <p>Курсовий інтернет-магазин</p>
-    </div>
-
-    <div id="shop-tab" class="tab-content active">
-        <div id="products-container">
-            <p style="text-align: center; color: var(--hint-color);">Завантаження товарів...</p>
+    <div id="tab-market" class="tab-content active">
+        <div class="container">
+            <h2>Каталог товарів</h2>
+            <div id="products-container"></div>
         </div>
     </div>
 
-    <div id="profile-tab" class="tab-content" style="display: none;">
-        <div class="profile-info">
-            <h3 id="username-display">Завантаження...</h3>
-            <p style="font-size: 12px; color: var(--hint-color);">ID: <span id="user-id-display">---</span></p>
-            <p style="font-size: 12px; color: var(--hint-color);" id="db-username-field"></p>
-        </div>
-        <h3>Мої покупки:</h3>
-        <div class="purchases-list" id="purchases-container">
-            <p style="color: var(--hint-color);">Завантаження покупок...</p>
+    <div id="tab-profile" class="tab-content">
+        <div class="container">
+            <div class="profile-card">
+                <h2 id="profile-name">Завантаження...</h2>
+                <p id="profile-id">ID: ---</p>
+            </div>
+            <h3>Мої покупки:</h3>
+            <div id="purchases-container"></div>
         </div>
     </div>
 
-    <div class="navbar">
-        <button class="nav-item active" id="btn-shop" onclick="switchTab('shop')">
-            <div class="nav-icon">🛒</div>
-            Магазин
+    <nav class="bottom-nav">
+        <button class="nav-item active" id="btn-market" onclick="switchTab('market')">
+            <span class="nav-icon">🛒</span>
+            <span class="nav-label">Магазин</span>
         </button>
         <button class="nav-item" id="btn-profile" onclick="switchTab('profile')">
-            <div class="nav-icon">👤</div>
-            Профіль
+            <span class="nav-icon">👤</span>
+            <span class="nav-label">Профіль</span>
         </button>
-    </div>
+    </nav>
 
-    <script src="/pages/app.js?v=3"></script>
+    <script src="/pages/app.js"></script>
 </body>
 </html>

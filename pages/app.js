@@ -1,39 +1,65 @@
-const tg = window.Telegram.WebApp;
 
-let currentUserId = null;
+let userId = 123456789;
+let userUsername = "Браузерний користувач";
+let tg = null;
 
-// Функція, яка виконається ТІЛЬКИ після повної готовності Telegram WebApp
-tg.ready(() => {
-    tg.expand();
+function initializeApp() {
 
-    // Ініціалізуємо дані користувача строго всередині готовності
-    if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-        const user = tg.initDataUnsafe.user;
-        currentUserId = user.id;
-        document.getElementById('username-display').innerText = user.first_name + (user.last_name ? ' ' + user.last_name : '');
-        document.getElementById('user-id-display').innerText = user.id;
+    if (window.Telegram && window.Telegram.WebApp) {
+        tg = window.Telegram.WebApp;
+
+
+        tg.ready();
+        tg.expand();
+
+
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            userId = tg.initDataUnsafe.user.id;
+            userUsername = tg.initDataUnsafe.user.username || `User_${userId}`;
+        }
     } else {
-        // Якщо тестуємо в браузері
-        currentUserId = 123456789;
-        document.getElementById('username-display').innerText = "Vergil (Тестовий Профіль)";
-        document.getElementById('user-id-display').innerText = currentUserId;
+        console.log("Додаток запущено поза межами Telegram Mini App. Використовуємо дефолтні дані.");
     }
 
-    // Запускаємо завантаження товарів ТІЛЬКИ після того, як визначили ID юзера
-    loadProducts();
-});
 
-// 1. Завантаження товарів для витрини магазину
+    loadProducts();
+}
+
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+    initializeApp();
+}
+
+
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+    if (tabName === 'market') {
+        document.getElementById('tab-market').classList.add('active');
+        document.getElementById('btn-market').classList.add('active');
+    } else if (tabName === 'profile') {
+        document.getElementById('tab-profile').classList.add('active');
+        document.getElementById('btn-profile').classList.add('active');
+        loadUserProfile();
+    }
+}
+
+
 async function loadProducts() {
     const container = document.getElementById('products-container');
+    if (!container) return;
+
     try {
         const response = await fetch('/api/products');
-        if (!response.ok) throw new Error(`Помилка: ${response.status}`);
+        if (!response.ok) throw new Error(`Помилка сервера: ${response.status}`);
 
         const products = await response.json();
 
         if (!products || products.length === 0) {
-            container.innerHTML = `<p style="text-align: center; color: var(--hint-color); padding: 20px;">Наразі в магазині немає товарів.</p>`;
+            container.innerHTML = '<p style="text-align: center; color: gray; margin-top: 20px;">Наразі товарів немає.</p>';
             return;
         }
 
@@ -41,110 +67,70 @@ async function loadProducts() {
         products.forEach(prod => {
             html += `
                 <div class="product-card">
-                    <div class="product-name">${prod.name}</div>
-                    <div class="product-desc">${prod.description}</div>
-                    <div class="product-footer">
-                        <div class="product-price">${prod.price.toFixed(2)} UAH</div>
-                        <button class="buy-btn" onclick="buyProduct(${prod.id}, '${prod.name}')">Купити</button>
+                    <h3 style="margin: 0 0 8px 0; font-size: 18px;">${prod.name}</h3>
+                    <p style="color: #666; font-size: 14px; margin: 0 0 12px 0;">${prod.description}</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <b style="color: #007bc1; font-size: 16px;">${prod.price.toFixed(2)} UAH</b>
+                        <button onclick="sendBuyAction(${prod.id}, '${prod.name}')" style="padding: 8px 16px; background: #007bc1; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Купити</button>
                     </div>
                 </div>
             `;
         });
         container.innerHTML = html;
-    } catch (error) {
-        console.error("Помилка при завантаженні товарів:", error);
-        container.innerHTML = `<p style="text-align: center; color: #ff4d4d; padding: 20px;">❌ Не вдалося завантажити товари.</p>`;
+    } catch (e) {
+        console.error(e);
+        container.innerHTML = `<p style="text-align: center; color: red; margin-top: 20px;">❌ Не вдалося завантажити товари.</p>`;
     }
 }
 
-// 2. Загрузка даних користувача з БД
-async function loadDbUserData() {
-    if (!currentUserId) return;
-    const dbField = document.getElementById('db-username-field');
 
-    try {
-        const response = await fetch(`/api/user_data?id=${currentUserId}`);
-        if (response.ok) {
-            const data = await response.json();
-            if (data.username) {
-                dbField.innerHTML = `🔑 <b>БД Никнейм:</b> @${data.username}`;
-            } else {
-                dbField.innerHTML = `🔑 <b>БД Никнейм:</b> немає`;
-            }
-        } else {
-            dbField.innerHTML = `<span style="color: var(--hint-color);">Користувача немає в БД</span>`;
-        }
-    } catch (error) {
-        console.error("Помилка отримання даних користувача з БД:", error);
-    }
-}
-
-// 3. Загрузка покупок користувача з БД
-async function loadDbPurchases() {
-    if (!currentUserId) return;
-    const container = document.getElementById('purchases-container');
-
-    try {
-        const response = await fetch(`/api/purchase?id=${currentUserId}`);
-        if (!response.ok) throw new Error(`Статус: ${response.status}`);
-
-        const purchases = await response.json();
-
-        if (!purchases || purchases.length === 0) {
-            container.innerHTML = `<p style="color: var(--hint-color);">Ви ще не придбали жодного товару.</p>`;
-            return;
-        }
-
-        let htmlContent = '';
-        purchases.forEach(itemName => {
-            htmlContent += `
-                <div class="purchase-item" style="border-left: 3px solid var(--button-color); padding-left: 8px; margin-bottom: 8px; text-align: left;">
-                    📦 <b>${itemName}</b> <br>
-                    <span style="font-size: 11px; color: var(--hint-color);">Статус: Оплачено (Синхронізовано з БД)</span>
-                </div>
-            `;
-        });
-        container.innerHTML = htmlContent;
-    } catch (error) {
-        console.error("Помилка завантаження покупок з БД:", error);
-        container.innerHTML = `<p style="color: #ff4d4d;">❌ Не вдалося завантажити історію покупок.</p>`;
-    }
-}
-
-// 4. Переключення вкладок
-function switchTab(tab) {
-    const shopTab = document.getElementById('shop-tab');
-    const profileTab = document.getElementById('profile-tab');
-    const btnShop = document.getElementById('btn-shop');
-    const btnProfile = document.getElementById('btn-profile');
-
-    if (tab === 'shop') {
-        shopTab.style.display = 'block';
-        profileTab.style.display = 'none';
-        btnShop.classList.add('active');
-        btnProfile.classList.remove('active');
-    } else if (tab === 'profile') {
-        shopTab.style.display = 'none';
-        profileTab.style.display = 'block';
-        btnShop.classList.remove('active');
-        btnProfile.classList.add('active');
-
-        loadDbUserData();
-        loadDbPurchases();
-    }
-}
-
-// 5. Логіка купівлі
-function buyProduct(productId, productName) {
-    try {
-        const data = {
+function sendBuyAction(productId, productName) {
+    if (tg) {
+        const dataToSend = {
             action: "buy",
             product_id: productId,
             product_name: productName
         };
-        tg.sendData(JSON.stringify(data));
+
+        tg.sendData(JSON.stringify(dataToSend));
         tg.close();
-    } catch (error) {
-        alert("Помилка отправки даних боту: " + error.message);
+    } else {
+        alert(`Емуляція купівлі в браузері: ${productName} (ID: ${productId})`);
+    }
+}
+
+
+async function loadUserProfile() {
+    document.getElementById('profile-name').innerText = userUsername;
+    document.getElementById('profile-id').innerText = `ID: ${userId}`;
+
+    const purchasesContainer = document.getElementById('purchases-container');
+    purchasesContainer.innerHTML = '<p style="text-align: center; color: gray;">Завантаження покупок...</p>';
+
+    try {
+        const response = await fetch(`/api/profile?telegram_id=${userId}&username=${encodeURIComponent(userUsername)}`);
+        if (!response.ok) throw new Error(`Статус: ${response.status}`);
+
+        const data = await response.json();
+
+        if (!data.purchases || data.purchases.length === 0) {
+            purchasesContainer.innerHTML = '<p style="text-align: center; color: gray;">Ви ще не придбали жодного товару.</p>';
+            return;
+        }
+
+        let html = '';
+        data.purchases.forEach(title => {
+            html += `
+                <div class="purchase-item">
+                    <strong>📦 ${title}</strong>
+                    <div style="font-size: 12px; color: #8e8e93; margin-top: 4px;">Статус: Доступ надано</div>
+                </div>
+            `;
+        });
+        purchasesContainer.innerHTML = html;
+
+    } catch (e) {
+        console.error(e);
+        purchasesContainer.innerHTML = `<p style="text-align: center; color: red;">❌ Помилка синхронізації з БД.</p>`;
     }
 }
