@@ -11,9 +11,7 @@ from handlers.add_product import router as addproduct_router
 from db import engine, Base
 from dotenv import load_dotenv
 
-
 logging.basicConfig(level=logging.INFO)
-
 
 load_dotenv()
 
@@ -24,9 +22,10 @@ dp = Dispatcher()
 
 async def main():
     logging.info("Створюємо таблиці бд")
-    Base.metadata.create_all(bind=engine)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
-    seed_products()
+    await seed_products()
 
     logging.info("Реєстрація хендлерів")
     dp.include_router(start_router)
@@ -34,6 +33,7 @@ async def main():
     dp.include_router(payments_router)
     dp.include_router(seller_router)
     dp.include_router(addproduct_router)
+
     logging.info("Запуск бота")
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)

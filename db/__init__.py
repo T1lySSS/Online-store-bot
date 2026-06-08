@@ -1,25 +1,31 @@
 import os
-
 from dotenv import load_dotenv
-from sqlalchemy import create_engine, event
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from sqlalchemy.orm import declarative_base
 
 load_dotenv()
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///shop.db")
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-Sessionlocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///shop.db")
+
+
+engine = create_async_engine(DATABASE_URL, echo=False)
+
+
+async_session = async_sessionmaker(
+    bind=engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+    autocommit=False,
+    autoflush=False
+)
+
 Base = declarative_base()
 
-@event.listens_for(engine, "connect")
-def set_sqlite_pragma(dbapi_connection, connection_record):
-    cursor = dbapi_connection.cursor()
-    cursor.execute("PRAGMA foreign_keys=ON")
-    cursor.close()
 
-def get_db():
-    db = Sessionlocal()
-    try:
-        yield db
-    finally:
-        db.close()
+async def get_db():
+    async with async_session() as db:
+        try:
+            yield db
+        finally:
+            await db.close()

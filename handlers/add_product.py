@@ -42,7 +42,7 @@ async def write_product_price(message: Message, state: FSMContext):
         state_data = await state.get_data()
         name = state_data.get("product_name")
         description = state_data.get("product_description")
-        save_product(name, description, price)
+        await save_product(name, description, price)
         await state.clear()
         await message.answer("Ваш товар було додано!")
 

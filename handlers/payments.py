@@ -21,7 +21,7 @@ async def process_successful_payment(message: Message):
     product_id = int(payload.split("_")[-1])
     user_id = message.from_user.id
 
-    save_purchase(telegram_id=user_id, product_id=product_id)
+    await save_purchase(telegram_id=user_id, product_id=product_id)
 
     await message.answer(
         f"💳 **Оплата успішна!**\n\n"

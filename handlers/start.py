@@ -1,32 +1,27 @@
-import json
-import base64
-from aiogram import Router, types
-from aiogram.filters import CommandStart
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, WebAppInfo
-from db.requests import register_user, get_all_products  # убедись, что имя функции совпадает
+from aiogram import Router, F
+from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 
 router = Router()
-WEB_APP_URL = "https://unfixable-employer-regally.ngrok-free.dev"  # Твоя актуальная ссылка ngrok
+
+@router.message(F.text == "/start")
+async def start_cmd(message: Message):
+
+    web_app_url = "https://unfixable-employer-regally.ngrok-free.dev"
 
 
-@router.message(CommandStart())
-async def start_command(message: types.Message):
-    register_user(telegram_id=message.from_user.id, username=message.from_user.username)
-
-    markup = ReplyKeyboardMarkup(
-        keyboard=[
+    kb = InlineKeyboardMarkup(
+        inline_keyboard=[
             [
-                KeyboardButton(
+                InlineKeyboardButton(
                     text="🛒 Відкрити магазин",
-                    web_app=WebAppInfo(url=WEB_APP_URL)
+                    web_app=WebAppInfo(url=web_app_url)
                 )
             ]
-        ],
-        resize_keyboard=True
+        ]
     )
 
     await message.answer(
-        f"Вітаємо в інтернет магазині цифрових товарів \"Vergil's motivation\"\n\n"
-        f"Натисніть кнопку нижче, щоб відкрити наш магазин з актуальними товарами з БД:",
-        reply_markup=markup
+        "Вітаємо в інтернет-магазині цифрових товарів \"Vergil's motivation\"\n\n"
+        "Натисніть кнопку нижче, щоб відкрити наш магазин з актуальними товарами з БД:",
+        reply_markup=kb
     )

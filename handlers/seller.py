@@ -22,7 +22,7 @@ async def start_seller_reg(message: types.Message, state: FSMContext):
         return
 
 
-    register_user(telegram_id=user_id, username=message.from_user.username)
+    await register_user(telegram_id=user_id, username=message.from_user.username)
 
     await message.answer("🏪 **Реєстрація аккаунта продавця**\n\nБудь ласка, введіть назву вашого майбутнього магазину:")
 
