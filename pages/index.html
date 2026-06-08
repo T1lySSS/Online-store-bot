@@ -5,52 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vergil's Motivation Store</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/pages/styles.css?v=3">
 </head>
 <body>
 
     <div class="header">
         <h1 id="shop-title">Motivation Store</h1>
-        <p>Курсовий інтернет-магазин ZOVZOV</p>
+        <p>Курсовий інтернет-магазин</p>
     </div>
 
     <div id="shop-tab" class="tab-content active">
-        <div class="product-card">
-            <div class="product-name">🔥 Motivation Pack</div>
-            <div class="product-desc">Повний пакет мотивації від Вергілія. Додає +100% до швидкості написання коду курсової.</div>
-            <div class="product-footer">
-                <div class="product-price">150.00 UAH</div>
-                <button class="buy-btn" onclick="buyProduct(1, '🔥 Motivation Pack')">Купити</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <div class="product-name">⚡ Yamato Digital Link</div>
-            <div class="product-desc">Цифровий сертифікат на володіння легендарним мечем Ямато. Дозволяє розрізати дедлайни.</div>
-            <div class="product-footer">
-                <div class="product-price">300.00 UAH</div>
-                <button class="buy-btn" onclick="buyProduct(2, '⚡ Yamato Digital Link')">Купити</button>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <div class="product-name">👑 Premium Status</div>
-            <div class="product-desc">Преміум статус у всесвіті Devil May Cry. Повний доступ до ексклюзивного контенту.</div>
-            <div class="product-footer">
-                <div class="product-price">500.00 UAH</div>
-                <button class="buy-btn" onclick="buyProduct(3, '👑 Premium Status')">Купити</button>
-            </div>
+        <div id="products-container">
+            <p style="text-align: center; color: var(--hint-color);">Завантаження товарів...</p>
         </div>
     </div>
 
-    <div id="profile-tab" class="tab-content">
+    <div id="profile-tab" class="tab-content" style="display: none;">
         <div class="profile-info">
-            <h3 id="username-display">Користувач</h3>
+            <h3 id="username-display">Завантаження...</h3>
             <p style="font-size: 12px; color: var(--hint-color);">ID: <span id="user-id-display">---</span></p>
+            <p style="font-size: 12px; color: var(--hint-color);" id="db-username-field"></p>
         </div>
         <h3>Мої покупки:</h3>
         <div class="purchases-list" id="purchases-container">
-            <p style="color: var(--hint-color);">Тут будуть відображатися куплені товари після оплати.</p>
+            <p style="color: var(--hint-color);">Завантаження покупок...</p>
         </div>
     </div>
 
@@ -65,6 +43,6 @@
         </button>
     </div>
 
-    <script src="app.js"></script>
+    <script src="/pages/app.js?v=3"></script>
 </body>
 </html>

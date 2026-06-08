@@ -7,6 +7,7 @@ from handlers.start import router as start_router
 from handlers.webapp import router as webapp_router
 from handlers.payments import router as payments_router
 from handlers.seller import router as seller_router
+from handlers.add_product import router as addproduct_router
 from db import engine, Base
 from dotenv import load_dotenv
 
@@ -32,6 +33,7 @@ async def main():
     dp.include_router(webapp_router)
     dp.include_router(payments_router)
     dp.include_router(seller_router)
+    dp.include_router(addproduct_router)
     logging.info("Запуск бота")
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)

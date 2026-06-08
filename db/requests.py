@@ -28,6 +28,14 @@ def get_user_purchases(telegram_id: int):
         )
         return [p.name for p in purchases]
 
+def get_user_data(telegram_id: int):
+    with Sessionlocal() as session:
+        user = session.query(User).filter(User.telegram_id == telegram_id).first()
+        if not user:
+            return None
+        return user
+
+
 def seed_products():
     with Sessionlocal() as session:
         if session.query(Product).count() == 0:
@@ -54,3 +62,29 @@ def is_user_seller(telegram_id: int) -> bool:
     with Sessionlocal() as session:
         seller = session.query(Seller).filter(Seller.user_id == telegram_id).first()
         return seller is not None
+
+def save_product(name:str, description:str, price:float):
+    with Sessionlocal() as session:
+        new_product = Product(name=name,
+                              description=description,
+                              price=price)
+        session.add(new_product)
+        session.commit()
+        return True
+
+
+def get_all_products():
+    with Sessionlocal() as session:
+        products = session.query(Product).all()
+
+        products_list = []
+
+        for p in products:
+            products_list.append({
+                "id": p.id,
+                "name": p.name,
+                "description": p.description,
+                "price": float(p.price)
+            })
+
+        return products_list
