@@ -1,19 +1,24 @@
-
 let userId = 123456789;
 let userUsername = "Браузерний користувач";
 
-
 window.addEventListener('DOMContentLoaded', () => {
-
     try {
         const tg = window.Telegram.WebApp;
-        if (tg) {
-            tg.ready();
-            tg.expand();
+        tg.ready();
+        tg.expand();
 
 
-            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                const user = tg.initDataUnsafe.user;
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            const user = tg.initDataUnsafe.user;
+            userId = user.id;
+            userUsername = user.username || `${user.first_name} ${user.last_name || ''}`.trim();
+        }
+
+        else if (tg.initData) {
+            const urlParams = new URLSearchParams(tg.initData);
+            const userString = urlParams.get('user');
+            if (userString) {
+                const user = JSON.parse(userString);
                 userId = user.id;
                 userUsername = user.username || `${user.first_name} ${user.last_name || ''}`.trim();
             }
@@ -21,7 +26,6 @@ window.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
         console.error("Помилка Telegram WebApp:", err);
     }
-
 
     try {
         const nameElem = document.getElementById('profile-name');
@@ -32,10 +36,8 @@ window.addEventListener('DOMContentLoaded', () => {
         console.error("Помилка відображення профілю:", err);
     }
 
-
     loadProducts();
 });
-
 
 async function loadProducts() {
     const container = document.getElementById('products-container');
@@ -56,13 +58,15 @@ async function loadProducts() {
 
         let html = '';
         products.forEach(p => {
+
+            const priceInCents = Math.round(p.price * 100);
             html += `
                 <div class="product-card">
                     <h3>${p.name}</h3>
                     <p>${p.description}</p>
                     <div class="product-footer">
                         <span class="price">${p.price.toFixed(2)} UAH</span>
-                        <button class="buy-btn" onclick="buyProduct(${p.id}, '${p.name}')">Купити</button>
+                        <button class="buy-btn" onclick="buyProduct(${p.id}, '${p.name}', ${priceInCents})">Купити</button>
                     </div>
                 </div>
             `;
@@ -71,10 +75,9 @@ async function loadProducts() {
 
     } catch (err) {
         console.error("Помилка при завантаженні товарів:", err);
-        container.innerHTML = '<p style="text-align: center; color: red;">❌ Не вдалося завантажити товари.</p>';
+        container.innerHTML = '<p style="text-align: center; color: red;">Не вдалося завантажити товари.</p>';
     }
 }
-
 
 async function loadUserProfile() {
     const nameElem = document.getElementById('profile-name');
@@ -112,29 +115,31 @@ async function loadUserProfile() {
 
     } catch (err) {
         console.error("Помилка в loadUserProfile:", err);
-        purchasesContainer.innerHTML = `<p style="text-align: center; color: red;">❌ Помилка синхронізації з БД.</p>`;
+        purchasesContainer.innerHTML = `<p style="text-align: center; color: red;">Помилка синхронізації з БД.</p>`;
     }
 }
 
-
-function buyProduct(id, name) {
+function buyProduct(id, name, price) {
     try {
         const tg = window.Telegram.WebApp;
         if (tg) {
             const data = {
                 action: "buy",
                 product_id: id,
-                product_name: name
+                product_name: name,
+                price: price
             };
             tg.sendData(JSON.stringify(data));
-            tg.close();
+
+
+            setTimeout(() => {
+                tg.close();
+            }, 500);
         }
     } catch (err) {
         console.error("Помилка при купівлі:", err);
-        alert("Помилка при спробі купити товар.");
     }
 }
-
 
 function switchTab(tabName) {
     const marketTab = document.getElementById('tab-market');

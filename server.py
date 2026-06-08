@@ -24,7 +24,7 @@ async def handle_get_products(request):
         products = await get_all_products()
         return web.json_response(products)
     except Exception as ex:
-        print(f"❌ Помилка в handle_get_products: {ex}")
+        print(f"Помилка в handle_get_products: {ex}")
         return web.json_response({"error": str(ex)}, status=500)
 
 
@@ -53,7 +53,7 @@ async def handle_get_profile(request):
             "purchases": user_purchases
         })
     except Exception as ex:
-        print(f"❌ Помилка в handle_get_profile: {ex}")
+        print(f"Помилка в handle_get_profile: {ex}")
         return web.json_response({"error": str(ex)}, status=500)
 
 
@@ -72,5 +72,5 @@ def make_app():
 
 if __name__ == '__main__':
     app = make_app()
-    print("🚀 Асинхронний сервер запущено на http://localhost:8000")
+    print("Асинхронний сервер запущено на http://localhost:8000")
     web.run_app(app, host='localhost', port=8000)

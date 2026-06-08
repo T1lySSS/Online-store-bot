@@ -1,5 +1,5 @@
 from aiogram import Router, F
-from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
+from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo, MenuButtonWebApp, KeyboardButton, ReplyKeyboardMarkup
 
 router = Router()
 
@@ -7,6 +7,19 @@ router = Router()
 async def start_cmd(message: Message):
 
     web_app_url = "https://unfixable-employer-regally.ngrok-free.dev"
+
+
+    markup = ReplyKeyboardMarkup(
+        keyboard=[
+            [
+                KeyboardButton(
+                    text="🛒 Відкрити магазин",
+                    web_app=WebAppInfo(url=web_app_url)
+                )
+            ]
+        ],
+        resize_keyboard=True
+    )
 
 
     kb = InlineKeyboardMarkup(
@@ -21,7 +34,11 @@ async def start_cmd(message: Message):
     )
 
     await message.answer(
-        "Вітаємо в інтернет-магазині цифрових товарів \"Vergil's motivation\"\n\n"
-        "Натисніть кнопку нижче, щоб відкрити наш магазин з актуальними товарами з БД:",
+        f"Вітаємо в інтернет магазині цифрових товарів Vergil's motivation"
+        f"Натисніть кнопку нижче, щоб відкрити наш магазин",
+        reply_markup=markup,
+    )
+    await message.answer(
+        f".",
         reply_markup=kb
     )

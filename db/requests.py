@@ -43,23 +43,7 @@ async def get_user_data(telegram_id: int):
         return user
 
 
-async def seed_products():
-    async with async_session() as session:
-        count_result = await session.execute(select(func.count()).select_from(Product))
-        count = count_result.scalar()
-        if count == 0:
-            products = [
-                Product(name="🔥 Motivation Pack",
-                        description="Повний пакет мотивації від Вергілія. Додає +100% до швидкості коду.", price=150.0),
-                Product(name="⚡ Yamato Digital Link",
-                        description="Цифровий сертифікат на володіння легендарним мечем Ямато.", price=300.0),
-                Product(name="👑 Premium Status",
-                        description="Преміум статус у всесвіті Devil May Cry. Доступ до ексклюзивних мемів.",
-                        price=500.0),
-            ]
-            session.add_all(products)
-            await session.commit()
-            print("База даних успішно заповнена тестовими товарами!")
+
 
 
 async def register_seller(telegram_id: int, shop_name: str):

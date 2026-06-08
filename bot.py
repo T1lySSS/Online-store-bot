@@ -2,7 +2,6 @@ import asyncio
 import logging
 import os
 from aiogram import Bot, Dispatcher
-from db.requests import seed_products
 from handlers.start import router as start_router
 from handlers.webapp import router as webapp_router
 from handlers.payments import router as payments_router
@@ -25,7 +24,6 @@ async def main():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-    await seed_products()
 
     logging.info("Реєстрація хендлерів")
     dp.include_router(start_router)
